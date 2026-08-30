@@ -280,8 +280,8 @@
   <input id="setKey" type="password" placeholder="AIza…" autocomplete="off">
   <p style="margin-top:4px">Free at <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">aistudio.google.com/apikey</a> — sign in with Google, "Create API key".</p>
   <label>Model</label>
-  <input id="setModel" type="text" placeholder="gemini-2.5-flash">
-  <p style="margin-top:4px">If this model name is ever retired, put the current "flash" model id here.</p>
+  <input id="setModel" type="text" placeholder="gemini-3.6-flash">
+  <p style="margin-top:4px">If this model name is ever retired, put the current "flash" model id here (Google lists them at ai.google.dev/gemini-api/docs/models).</p>
   <label>My current level (update monthly)</label>
   <select id="setLevel">
     <option>A0</option><option>A1</option><option>A2</option><option>B1</option><option>B2</option>
@@ -298,7 +298,7 @@
 "use strict";
 /* ============================== state ============================== */
 const DEFAULTS = {
-  apiKey:"", model:"gemini-2.5-flash", level:"A0", tts:true,
+  apiKey:"", model:"gemini-3.6-flash", level:"A0", tts:true,
   errors:[],   // {wrong, right, note, count, last}
   cards:[],    // {front, back, added}
   sessions:[], // {date:"YYYY-MM-DD", mode, turns}
@@ -306,7 +306,12 @@ const DEFAULTS = {
 };
 let S = load();
 function load(){
-  try{ return Object.assign({}, DEFAULTS, JSON.parse(localStorage.getItem("frtutor.v1")||"{}")); }
+  try{
+    const s = Object.assign({}, DEFAULTS, JSON.parse(localStorage.getItem("frtutor.v1")||"{}"));
+    // Google retired pre-3.6 models; silently migrate stored settings
+    if(/^gemini-[12]\./.test(s.model)) s.model = DEFAULTS.model;
+    return s;
+  }
   catch(e){ return {...DEFAULTS}; }
 }
 function save(){ try{ localStorage.setItem("frtutor.v1", JSON.stringify(S)); }catch(e){ toast("⚠ Could not save — storage full?"); } }
@@ -676,7 +681,7 @@ document.getElementById("levelPill").onclick = openSettings;
 document.getElementById("setCancel").onclick = ()=>dlg.close();
 document.getElementById("setSave").onclick = ()=>{
   S.apiKey = document.getElementById("setKey").value.trim();
-  S.model = document.getElementById("setModel").value.trim() || "gemini-2.5-flash";
+  S.model = document.getElementById("setModel").value.trim() || DEFAULTS.model;
   S.level = document.getElementById("setLevel").value;
   save(); dlg.close(); renderAll(); toast("Saved");
 };
