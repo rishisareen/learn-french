@@ -168,10 +168,11 @@
   dialog h2{font-family:'Fraunces',serif; margin:0 0 4px; font-size:1.25rem}
   dialog p{font-size:.87rem; color:var(--ink-soft); margin:.3em 0 1em}
   dialog label{display:block; font-size:.78rem; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--ink-soft); margin:12px 0 4px}
-  dialog input, dialog select{
+  dialog input, dialog select, dialog textarea{
     width:100%; padding:9px 11px; border:1.5px solid var(--line); border-radius:10px;
-    background:var(--paper); color:var(--ink); font:inherit;
+    background:var(--paper); color:var(--ink); font:inherit; box-sizing:border-box;
   }
+  dialog textarea{resize:vertical}
   dialog a{color:var(--blue)}
   .drow{display:flex; gap:8px; margin-top:18px; justify-content:flex-end}
   .primary{background:var(--blue); color:#fff; border:none; border-radius:10px; padding:9px 18px; font:inherit; font-weight:700; cursor:pointer}
@@ -233,7 +234,10 @@
     <!-- errors -->
     <section class="pane" id="pane-errors">
       <div class="listwrap">
-        <p class="hint">Your persistent error log — injected into every new session so the tutor targets these. Most-repeated first.</p>
+        <div class="toolbar">
+          <button class="tbtn" id="importBtn">⇪ Import from ChatGPT / Claude / Gemini Live</button>
+        </div>
+        <p class="hint">Your persistent error log — injected into every new session so the tutor targets these. Most-repeated first. After a voice session elsewhere, ask that AI to "list all my French errors from this conversation", copy the answer, and Import it here.</p>
         <div id="errList"></div>
       </div>
     </section>
@@ -289,6 +293,17 @@
   <div class="drow">
     <button class="ghost" id="setCancel">Cancel</button>
     <button class="primary" id="setSave">Save</button>
+  </div>
+</dialog>
+
+<!-- import external session -->
+<dialog id="importDlg">
+  <h2>Import external session</h2>
+  <p>Paste an error list or transcript from a ChatGPT / Gemini Live / Claude practice session. The tutor extracts the errors and Anki cards into your permanent log (costs 1 API request).</p>
+  <textarea id="importText" rows="8"></textarea>
+  <div class="drow">
+    <button class="ghost" id="importCancel">Cancel</button>
+    <button class="primary" id="importGo">Extract &amp; save</button>
   </div>
 </dialog>
 
@@ -494,41 +509,67 @@ document.getElementById("modes").addEventListener("click", e=>{
   }
 })();
 
-/* ============================== end session ============================== */
-document.getElementById("endBtn").onclick = async ()=>{
-  if(busy || !S.chat.length) return;
-  busy = true; showThinking(true);
-  const transcript = S.chat.map(m=>(m.role==="user"?"STUDENT: ":"TUTOR: ")+m.text).join("\n\n");
-  const sys = `You are a French tutor's assistant. Extract structured learning data from the session transcript. Reply with pure JSON only, matching:
+/* ============================== extraction (end session + import) ============================== */
+const extractSys = src => `You are a French tutor's assistant. Extract structured learning data from the ${src}. Reply with pure JSON only, matching:
 {"errors":[{"wrong":"student's incorrect French","right":"corrected French","note":"one-line English explanation"}],
  "cards":[{"front":"French word/phrase","back":"English meaning + one short example sentence in French"}],
  "focus":"one sentence: what the student should focus on next session"}
 Rules: only real errors the student made (3-10 of the most instructive); 3-6 cards for genuinely new vocabulary/structures; keep every string short.`;
+
+async function extractAndMerge(text, src){
+  const raw = await gemini([{role:"user",parts:[{text:"MATERIAL:\n\n"+text}]}], {json:true, sys:extractSys(src)});
+  const j = JSON.parse(raw.slice(raw.indexOf("{"), raw.lastIndexOf("}")+1));
+  let newE=0, bumped=0;
+  (j.errors||[]).forEach(e=>{
+    if(!e.wrong || !e.right) return;
+    const key = e.wrong.toLowerCase().replace(/[^\p{L}\p{N}' ]/gu,"").trim();
+    const hit = S.errors.find(x=>x.key===key);
+    if(hit){ hit.count++; hit.last=today(); hit.right=e.right; hit.note=e.note||hit.note; bumped++; }
+    else { S.errors.push({key, wrong:e.wrong, right:e.right, note:e.note||"", count:1, last:today()}); newE++; }
+  });
+  (j.cards||[]).forEach(c=>{ if(c.front&&c.back) S.cards.push({front:c.front, back:c.back, added:today()}); });
+  if(j.focus) S.focus = j.focus;
+  return {newE, bumped, cards:(j.cards||[]).length};
+}
+
+document.getElementById("endBtn").onclick = async ()=>{
+  if(busy || !S.chat.length) return;
+  busy = true; showThinking(true);
+  const transcript = S.chat.map(m=>(m.role==="user"?"STUDENT: ":"TUTOR: ")+m.text).join("\n\n");
   try{
-    const raw = await gemini([{role:"user",parts:[{text:"TRANSCRIPT:\n\n"+transcript}]}], {json:true, sys});
-    const j = JSON.parse(raw.slice(raw.indexOf("{"), raw.lastIndexOf("}")+1));
-    let newE=0, bumped=0;
-    (j.errors||[]).forEach(e=>{
-      if(!e.wrong || !e.right) return;
-      const key = e.wrong.toLowerCase().replace(/[^\p{L}\p{N}' ]/gu,"").trim();
-      const hit = S.errors.find(x=>x.key===key);
-      if(hit){ hit.count++; hit.last=today(); hit.right=e.right; hit.note=e.note||hit.note; bumped++; }
-      else { S.errors.push({key, wrong:e.wrong, right:e.right, note:e.note||"", count:1, last:today()}); newE++; }
-    });
-    (j.cards||[]).forEach(c=>{ if(c.front&&c.back) S.cards.push({front:c.front, back:c.back, added:today()}); });
-    if(j.focus) S.focus = j.focus;
+    const r = await extractAndMerge(transcript, "session transcript");
     const mins = S.chatStart ? Math.max(1, Math.round((Date.now()-S.chatStart)/60000)) : null;
     S.sessions.push({date:today(), mode:S.chatMode, turns:Math.ceil(S.chat.length/2), mins});
     S.chat = []; S.chatStart = null; save();
     showThinking(false); busy = false;
     chatScroll.innerHTML = "";
-    addMsg("model", `**Session saved.** ${newE} new error(s), ${bumped} repeat(s) logged, ${(j.cards||[]).length} Anki card(s) added.\n\n**Next focus:** ${S.focus||"—"}\n\nÀ demain ! 🔥`);
+    addMsg("model", `**Session saved.** ${r.newE} new error(s), ${r.bumped} repeat(s) logged, ${r.cards} Anki card(s) added.\n\n**Next focus:** ${S.focus||"—"}\n\nÀ demain ! 🔥`);
     endRow.hidden = true;
     renderAll();
   }catch(e){
     showThinking(false); busy = false;
     toast("⚠ Could not save session: "+e.message);
   }
+};
+
+/* import external session (ChatGPT voice, Gemini Live, Claude, class notes) */
+const importDlg = document.getElementById("importDlg");
+document.getElementById("importBtn").onclick = ()=>{
+  document.getElementById("importText").value = ""; importDlg.showModal();
+};
+document.getElementById("importCancel").onclick = ()=>importDlg.close();
+document.getElementById("importGo").onclick = async ()=>{
+  const text = document.getElementById("importText").value.trim();
+  if(!text || busy) return;
+  const btn = document.getElementById("importGo");
+  btn.disabled = true; btn.textContent = "Extracting…"; busy = true;
+  try{
+    const r = await extractAndMerge(text, "pasted notes or transcript from an external practice session (possibly mixed French/English, possibly from a voice conversation)");
+    S.sessions.push({date:today(), mode:"IMPORT", turns:0});
+    save(); renderAll(); importDlg.close();
+    toast(`Imported: ${r.newE} new error(s), ${r.bumped} repeat(s), ${r.cards} card(s)`);
+  }catch(e){ toast("⚠ Import failed: "+e.message); }
+  btn.disabled = false; btn.textContent = "Extract & save"; busy = false;
 };
 
 /* ============================== voice ============================== */
