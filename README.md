@@ -59,7 +59,9 @@ Build these into the routine rather than discovering them at the exam:
 
 ## AI tutor playbook (set up in Week 1)
 
-The full paste-ready Gem instruction lives in [`prompts/gemini-tutor.md`](prompts/gemini-tutor.md) — session modes (CONVERSATION / WRITING / GRAMMAR / QUIZ / EXAM), strict-correction rules, honest CEFR assessment, and an end-of-session error log that feeds Anki. Update its "MY CURRENT LEVEL" line monthly.
+**Primary interface: the tutor app at [`tutor/index.html`](tutor/index.html)** — a single-file web app that talks to the Gemini API directly and removes the manual steps: the error log, Anki cards, streak, and session stats are saved automatically in the browser and injected into every new session. Setup: open the file in Chrome, paste a free Gemini API key (aistudio.google.com/apikey) once. It has the five session modes, mic input (French speech recognition), read-aloud replies, Anki copy/CSV export, and JSON backup/restore. Data lives in that browser — take a backup occasionally.
+
+The paste-ready Gem instruction in [`prompts/gemini-tutor.md`](prompts/gemini-tutor.md) remains as a fallback (same pedagogy, manual error-log carry-over) — useful for Gemini Live voice sessions on the phone. Update the level (app settings / Gem instruction) monthly.
 
 Daily blocks: morning Anki (15–20 min) → commute Pimsleur (30 min) → evening AI voice conversation (20–30 min) + daily paragraph with correction (10–15 min). Grammar spine lesson 3–4×/week.
 

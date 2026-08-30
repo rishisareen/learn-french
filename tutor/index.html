@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Mon Tuteur — French for TCF Canada</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🇫🇷</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400;1,9..144,600&family=Public+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F6F1E7; --paper-2:#FDFBF5; --ink:#1E1C1A; --ink-soft:#5B564E;
+    --line:#E2D9C8; --blue:#28457F; --blue-soft:#E7ECF6; --red:#B5402A;
+    --gold:#B98A2E; --ok:#3E7C4F; --shadow:0 1px 2px rgba(30,28,26,.06),0 8px 24px -12px rgba(30,28,26,.18);
+    --radius:14px;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --paper:#191A1E; --paper-2:#22242A; --ink:#EDE8DD; --ink-soft:#A8A296;
+      --line:#33353D; --blue:#8FA9DE; --blue-soft:#252B3B; --red:#E07A5F;
+      --gold:#D4A94E; --ok:#7FBF8E; --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px -12px rgba(0,0,0,.5);
+    }
+  }
+  *{box-sizing:border-box} html,body{height:100%}
+  body{
+    margin:0; font-family:'Public Sans',system-ui,sans-serif; background:var(--paper);
+    color:var(--ink); font-size:15.5px; line-height:1.5;
+    background-image:radial-gradient(ellipse 80% 50% at 50% -10%, rgba(40,69,127,.06), transparent);
+  }
+  .app{max-width:760px; margin:0 auto; min-height:100dvh; display:flex; flex-direction:column}
+
+  /* ---------- header ---------- */
+  header{
+    padding:14px 16px 10px; display:flex; align-items:center; gap:10px;
+    border-bottom:1px solid var(--line); position:sticky; top:0; background:var(--paper); z-index:20;
+  }
+  .wordmark{font-family:'Fraunces',serif; font-style:italic; font-weight:600; font-size:1.35rem; letter-spacing:.01em}
+  .wordmark .fr{color:var(--blue)}
+  .spacer{flex:1}
+  .pill{
+    font-size:.78rem; font-weight:600; padding:4px 10px; border-radius:999px;
+    background:var(--blue-soft); color:var(--blue); border:1px solid transparent; cursor:pointer;
+  }
+  .streak{background:transparent; border:1px solid var(--line); color:var(--ink-soft)}
+  .iconbtn{
+    background:none; border:1px solid var(--line); border-radius:10px; width:34px; height:34px;
+    cursor:pointer; color:var(--ink-soft); font-size:1rem; display:grid; place-items:center;
+  }
+  .iconbtn:hover{border-color:var(--blue); color:var(--blue)}
+
+  /* ---------- modes ---------- */
+  .modes{display:flex; gap:8px; padding:12px 16px 4px; overflow-x:auto; scrollbar-width:none}
+  .modes::-webkit-scrollbar{display:none}
+  .mode{
+    flex:0 0 auto; font-size:.8rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase;
+    padding:8px 14px; border-radius:999px; border:1.5px solid var(--line); background:var(--paper-2);
+    color:var(--ink-soft); cursor:pointer; transition:all .15s;
+  }
+  .mode.active{border-color:var(--blue); background:var(--blue); color:#fff}
+  @media (prefers-color-scheme: dark){ .mode.active{color:#14161C} }
+
+  /* ---------- tabs ---------- */
+  .tabs{display:flex; gap:2px; padding:10px 16px 0; border-bottom:1px solid var(--line)}
+  .tab{
+    background:none; border:none; font:inherit; font-weight:600; font-size:.86rem; color:var(--ink-soft);
+    padding:8px 12px 10px; cursor:pointer; border-bottom:2.5px solid transparent; margin-bottom:-1px;
+  }
+  .tab.active{color:var(--ink); border-bottom-color:var(--red)}
+  .tab .count{font-size:.72rem; color:var(--red); font-weight:700}
+
+  main{flex:1; display:flex; flex-direction:column; min-height:0}
+  .pane{display:none; flex-direction:column; flex:1; min-height:0}
+  .pane.active{display:flex}
+
+  /* ---------- chat ---------- */
+  #chatScroll{flex:1; overflow-y:auto; padding:18px 16px 8px; display:flex; flex-direction:column; gap:14px}
+  .msg{max-width:88%; animation:rise .25s ease both}
+  @keyframes rise{from{opacity:0; transform:translateY(6px)} to{opacity:1; transform:none}}
+  .msg.tutor{align-self:flex-start; background:var(--paper-2); border-left:3px solid var(--blue);
+    border-radius:4px var(--radius) var(--radius) 4px; padding:10px 14px; box-shadow:var(--shadow)}
+  .msg.user{align-self:flex-end; background:var(--blue-soft); border-radius:var(--radius) 4px 4px var(--radius);
+    padding:10px 14px}
+  .msg .speak{border:none; background:none; cursor:pointer; font-size:.85rem; opacity:.55; padding:2px 4px 0 0}
+  .msg .speak:hover{opacity:1}
+  .msg .corr{display:block; color:var(--red); font-size:.88rem; margin-top:4px}
+  .msg b{font-weight:700} .msg i{font-style:italic}
+  .empty{margin:auto; text-align:center; color:var(--ink-soft); padding:32px 24px; max-width:420px}
+  .empty h2{font-family:'Fraunces',serif; font-weight:600; color:var(--ink); margin:0 0 8px; font-size:1.3rem}
+  .empty p{margin:.4em 0; font-size:.92rem}
+  .thinking{align-self:flex-start; color:var(--ink-soft); font-size:.85rem; padding:4px 8px}
+  .thinking i{animation:blink 1.2s infinite}
+  @keyframes blink{0%,100%{opacity:.3}50%{opacity:1}}
+
+  /* ---------- composer ---------- */
+  .composer{
+    padding:10px 16px calc(12px + env(safe-area-inset-bottom)); border-top:1px solid var(--line);
+    background:var(--paper); display:flex; gap:8px; align-items:flex-end; position:sticky; bottom:0;
+  }
+  #input{
+    flex:1; resize:none; border:1.5px solid var(--line); border-radius:12px; background:var(--paper-2);
+    color:var(--ink); font:inherit; padding:10px 12px; max-height:120px; outline:none;
+  }
+  #input:focus{border-color:var(--blue)}
+  .cbtn{
+    width:42px; height:42px; border-radius:12px; border:1.5px solid var(--line); background:var(--paper-2);
+    cursor:pointer; font-size:1.05rem; display:grid; place-items:center; color:var(--ink-soft); flex:0 0 auto;
+  }
+  .cbtn:hover{border-color:var(--blue); color:var(--blue)}
+  .cbtn.rec{border-color:var(--red); color:var(--red); animation:pulse 1s infinite}
+  @keyframes pulse{50%{box-shadow:0 0 0 5px rgba(181,64,42,.18)}}
+  .cbtn.send{background:var(--blue); border-color:var(--blue); color:#fff}
+  @media (prefers-color-scheme: dark){ .cbtn.send{color:#14161C} }
+  .endrow{padding:0 16px 8px; display:flex; justify-content:center}
+  .endbtn{
+    font-size:.8rem; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--red);
+    background:none; border:1.5px dashed var(--red); border-radius:999px; padding:6px 16px; cursor:pointer; opacity:.85;
+  }
+  .endbtn:hover{opacity:1}
+
+  /* ---------- lists ---------- */
+  .listwrap{flex:1; overflow-y:auto; padding:16px}
+  .card{
+    background:var(--paper-2); border:1px solid var(--line); border-radius:var(--radius);
+    padding:12px 14px; margin-bottom:10px; box-shadow:var(--shadow);
+  }
+  .err .wrong{color:var(--red); text-decoration:line-through; text-decoration-thickness:1.5px}
+  .err .right{color:var(--ok); font-weight:600}
+  .err .note{color:var(--ink-soft); font-size:.86rem; margin-top:3px}
+  .err .meta{font-size:.75rem; color:var(--gold); font-weight:700; float:right}
+  .del{float:right; background:none; border:none; color:var(--ink-soft); cursor:pointer; font-size:.8rem; margin-left:8px}
+  .del:hover{color:var(--red)}
+  .anki .front{font-weight:600} .anki .back{color:var(--ink-soft); font-size:.9rem}
+  .toolbar{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px}
+  .tbtn{
+    font-size:.82rem; font-weight:600; padding:7px 12px; border-radius:10px; cursor:pointer;
+    border:1.5px solid var(--line); background:var(--paper-2); color:var(--ink);
+  }
+  .tbtn:hover{border-color:var(--blue)}
+  .hint{color:var(--ink-soft); font-size:.85rem; margin:6px 0 14px}
+
+  /* ---------- stats ---------- */
+  .statgrid{display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:16px}
+  .stat{background:var(--paper-2); border:1px solid var(--line); border-radius:var(--radius); padding:14px; text-align:center}
+  .stat .n{font-family:'Fraunces',serif; font-size:1.7rem; font-weight:700; color:var(--blue)}
+  .stat .l{font-size:.72rem; text-transform:uppercase; letter-spacing:.08em; color:var(--ink-soft); font-weight:700}
+  .focusbox{border-left:3px solid var(--gold); padding:10px 14px; background:var(--paper-2); border-radius:4px var(--radius) var(--radius) 4px; font-size:.92rem}
+  .weekrow{display:flex; gap:6px; margin:14px 0}
+  .day{flex:1; text-align:center; font-size:.7rem; color:var(--ink-soft)}
+  .day .dot{width:100%; height:26px; border-radius:8px; background:var(--paper-2); border:1px solid var(--line); margin-bottom:4px; display:grid; place-items:center; font-size:.8rem}
+  .day.done .dot{background:var(--blue-soft); border-color:var(--blue)}
+
+  /* ---------- modal ---------- */
+  dialog{
+    border:1px solid var(--line); border-radius:16px; background:var(--paper-2); color:var(--ink);
+    max-width:440px; width:calc(100vw - 40px); padding:22px; box-shadow:var(--shadow);
+  }
+  dialog::backdrop{background:rgba(20,18,16,.45); backdrop-filter:blur(2px)}
+  dialog h2{font-family:'Fraunces',serif; margin:0 0 4px; font-size:1.25rem}
+  dialog p{font-size:.87rem; color:var(--ink-soft); margin:.3em 0 1em}
+  dialog label{display:block; font-size:.78rem; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--ink-soft); margin:12px 0 4px}
+  dialog input, dialog select{
+    width:100%; padding:9px 11px; border:1.5px solid var(--line); border-radius:10px;
+    background:var(--paper); color:var(--ink); font:inherit;
+  }
+  dialog a{color:var(--blue)}
+  .drow{display:flex; gap:8px; margin-top:18px; justify-content:flex-end}
+  .primary{background:var(--blue); color:#fff; border:none; border-radius:10px; padding:9px 18px; font:inherit; font-weight:700; cursor:pointer}
+  @media (prefers-color-scheme: dark){ .primary{color:#14161C} }
+  .ghost{background:none; border:1.5px solid var(--line); color:var(--ink-soft); border-radius:10px; padding:9px 14px; font:inherit; cursor:pointer}
+
+  #toast{
+    position:fixed; left:50%; bottom:90px; transform:translateX(-50%); background:var(--ink); color:var(--paper);
+    padding:9px 16px; border-radius:10px; font-size:.86rem; opacity:0; pointer-events:none; transition:opacity .25s; z-index:50; max-width:86vw;
+  }
+  #toast.show{opacity:.96}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="wordmark">Mon <span class="fr">Tuteur</span></div>
+    <div class="spacer"></div>
+    <button class="pill streak" id="streakPill" title="Consecutive study days">🔥 0</button>
+    <button class="pill" id="levelPill" title="Change level in settings">A0</button>
+    <button class="iconbtn" id="ttsBtn" title="Toggle read-aloud">🔊</button>
+    <button class="iconbtn" id="settingsBtn" title="Settings">⚙</button>
+  </header>
+
+  <div class="tabs">
+    <button class="tab active" data-pane="chat">Session</button>
+    <button class="tab" data-pane="errors">Errors <span class="count" id="errCount"></span></button>
+    <button class="tab" data-pane="anki">Anki</button>
+    <button class="tab" data-pane="stats">Progress</button>
+  </div>
+
+  <main>
+    <!-- chat -->
+    <section class="pane active" id="pane-chat">
+      <div class="modes" id="modes">
+        <button class="mode active" data-mode="CONVERSATION">Conversation</button>
+        <button class="mode" data-mode="WRITING">Writing</button>
+        <button class="mode" data-mode="GRAMMAR">Grammar</button>
+        <button class="mode" data-mode="QUIZ">Quiz</button>
+        <button class="mode" data-mode="EXAM">Exam</button>
+      </div>
+      <div id="chatScroll">
+        <div class="empty" id="emptyState">
+          <h2>Bonjour&nbsp;!</h2>
+          <p>Pick a mode above and say something — or tap 🎙 and speak.</p>
+          <p>Your tutor already knows your level and your recurring errors from previous sessions. When you finish, press <b>End session</b>: errors and Anki cards are saved here automatically.</p>
+        </div>
+      </div>
+      <div class="endrow" id="endRow" hidden><button class="endbtn" id="endBtn">■ End session &amp; save</button></div>
+      <div class="composer">
+        <textarea id="input" rows="1" placeholder="Écrivez en français…"></textarea>
+        <button class="cbtn" id="micBtn" title="Speak (French)">🎙</button>
+        <button class="cbtn send" id="sendBtn" title="Send">➤</button>
+      </div>
+    </section>
+
+    <!-- errors -->
+    <section class="pane" id="pane-errors">
+      <div class="listwrap">
+        <p class="hint">Your persistent error log — injected into every new session so the tutor targets these. Most-repeated first.</p>
+        <div id="errList"></div>
+      </div>
+    </section>
+
+    <!-- anki -->
+    <section class="pane" id="pane-anki">
+      <div class="listwrap">
+        <div class="toolbar">
+          <button class="tbtn" id="copyTsv">📋 Copy for Anki</button>
+          <button class="tbtn" id="dlCsv">⬇ Download CSV</button>
+          <button class="tbtn" id="clearCards">Clear exported</button>
+        </div>
+        <p class="hint">In Anki: File → Import, or paste with "Fields separated by: Tab". Cards accumulate here after each "End session".</p>
+        <div id="ankiList"></div>
+      </div>
+    </section>
+
+    <!-- stats -->
+    <section class="pane" id="pane-stats">
+      <div class="listwrap">
+        <div class="statgrid">
+          <div class="stat"><div class="n" id="stStreak">0</div><div class="l">day streak</div></div>
+          <div class="stat"><div class="n" id="stWeek">0</div><div class="l">sessions / 7d</div></div>
+          <div class="stat"><div class="n" id="stTotal">0</div><div class="l">total sessions</div></div>
+        </div>
+        <div class="weekrow" id="weekRow"></div>
+        <div class="focusbox" id="focusBox">No focus yet — finish your first session.</div>
+        <div class="toolbar" style="margin-top:18px">
+          <button class="tbtn" id="expBtn">⬇ Backup all data (JSON)</button>
+          <button class="tbtn" id="impBtn">⬆ Restore backup</button>
+          <input type="file" id="impFile" accept=".json" hidden>
+        </div>
+        <p class="hint">Data lives only in this browser. Back it up occasionally, or after a big session.</p>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- settings -->
+<dialog id="settings">
+  <h2>Settings</h2>
+  <p>The app talks directly to Google's Gemini API from your browser. Your key is stored only on this device and sent only to Google.</p>
+  <label>Gemini API key</label>
+  <input id="setKey" type="password" placeholder="AIza…" autocomplete="off">
+  <p style="margin-top:4px">Free at <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">aistudio.google.com/apikey</a> — sign in with Google, "Create API key".</p>
+  <label>Model</label>
+  <input id="setModel" type="text" placeholder="gemini-2.5-flash">
+  <p style="margin-top:4px">If this model name is ever retired, put the current "flash" model id here.</p>
+  <label>My current level (update monthly)</label>
+  <select id="setLevel">
+    <option>A0</option><option>A1</option><option>A2</option><option>B1</option><option>B2</option>
+  </select>
+  <div class="drow">
+    <button class="ghost" id="setCancel">Cancel</button>
+    <button class="primary" id="setSave">Save</button>
+  </div>
+</dialog>
+
+<div id="toast"></div>
+
+<script>
+"use strict";
+/* ============================== state ============================== */
+const DEFAULTS = {
+  apiKey:"", model:"gemini-2.5-flash", level:"A0", tts:true,
+  errors:[],   // {wrong, right, note, count, last}
+  cards:[],    // {front, back, added}
+  sessions:[], // {date:"YYYY-MM-DD", mode, turns}
+  focus:"", chat:[], chatMode:"CONVERSATION", chatStart:null
+};
+let S = load();
+function load(){
+  try{ return Object.assign({}, DEFAULTS, JSON.parse(localStorage.getItem("frtutor.v1")||"{}")); }
+  catch(e){ return {...DEFAULTS}; }
+}
+function save(){ try{ localStorage.setItem("frtutor.v1", JSON.stringify(S)); }catch(e){ toast("⚠ Could not save — storage full?"); } }
+const today = () => new Date().toISOString().slice(0,10);
+
+/* ============================== prompt ============================== */
+function systemPrompt(){
+  const errs = S.errors.slice().sort((a,b)=>b.count-a.count).slice(0,20)
+    .map(e=>`- "${e.wrong}" → "${e.right}" (${e.note||""}) [seen ${e.count}×]`).join("\n");
+  return `ROLE
+You are my personal French tutor. I am a 47-year-old English speaker in Delhi, India, preparing for the TCF Canada exam. My target is NCLC 7 (CEFR B2) in all four skills for Canadian immigration.
+
+MY CURRENT LEVEL: ${S.level}${S.level==="A0" ? " (complete beginner)" : ""}.
+
+MY RECURRING ERRORS (from previous sessions — actively create chances for me to get these right, and be strict when I repeat them):
+${errs || "- none recorded yet"}
+
+${S.focus ? "CURRENT FOCUS: "+S.focus : ""}
+
+GENERAL RULES
+1. Adapt everything to my level. Use French I can mostly understand; explain in English when needed. As my level rises, use more French, less English.
+2. Correct EVERY error — never let one pass to be polite. Put each correction on its own line starting with the character ▸ like: ▸ wrong → right — one-line English explanation. (Lines starting with ▸ are not read aloud, so keep spoken French on normal lines.)
+3. No empty praise. Only call my French "good" when it truly is for my level. Level assessments must be honest and strict against CEFR descriptors.
+4. Keep replies compact — this is a chat, not an essay. In CONVERSATION mode, your French comes first on normal lines, then ▸ corrections, then your next question.
+
+SESSION MODES (my message may start with the mode name; otherwise use the current mode: ${S.chatMode})
+- CONVERSATION: converse in French about everyday topics. Slightly slower/simpler than natural at first. Ask questions so I talk more than you. Correct via ▸ lines each turn.
+- WRITING: give me one short writing task for my level (later: TCF-style — messages, formal letters, opinion texts). When I send text, correct line by line with ▸ lines, then show a model version slightly above my level.
+- GRAMMAR: I name a topic or paste a confusing sentence. Explain in plain English with 5 examples, then drill me with 5 quick exercises, one at a time.
+- QUIZ: test me on my recurring errors and recent vocabulary — translation both directions, fill-in-the-blank. One question at a time; correct before the next.
+- EXAM: simulate a TCF Canada speaking or writing task with realistic format and timing, then score me against TCF criteria and state exactly what separates my answer from an NCLC 7 answer.
+
+If I drift off-topic or into English chat, pull me back to French practice.`;
+}
+
+/* ============================== gemini ============================== */
+async function gemini(contents, {json=false, sys=null} = {}){
+  if(!S.apiKey){ openSettings(); throw new Error("Add your Gemini API key first."); }
+  const body = {
+    systemInstruction:{parts:[{text: sys ?? systemPrompt()}]},
+    contents,
+    generationConfig: json ? {responseMimeType:"application/json", temperature:0.2} : {temperature:0.7}
+  };
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(S.model)}:generateContent?key=${encodeURIComponent(S.apiKey)}`;
+  const r = await fetch(url,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
+  if(!r.ok){
+    let msg = "API error "+r.status;
+    try{ msg = (await r.json()).error?.message || msg; }catch(e){}
+    throw new Error(msg.slice(0,200));
+  }
+  const data = await r.json();
+  const text = data.candidates?.[0]?.content?.parts?.map(p=>p.text||"").join("") || "";
+  if(!text) throw new Error("Empty reply — model may have been blocked or overloaded. Try again.");
+  return text;
+}
+const toContents = chat => chat.map(m=>({role: m.role==="user"?"user":"model", parts:[{text:m.text}]}));
+
+/* ============================== chat ui ============================== */
+const chatScroll = document.getElementById("chatScroll");
+const emptyState = document.getElementById("emptyState");
+const endRow = document.getElementById("endRow");
+const input = document.getElementById("input");
+
+function esc(s){ return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+function fmt(s){
+  return esc(s)
+    .replace(/\*\*(.+?)\*\*/g,"<b>$1</b>").replace(/\*(.+?)\*/g,"<i>$1</i>")
+    .split("\n").map(line => line.trim().startsWith("▸")
+      ? `<span class="corr">${line}</span>` : line).join("<br>")
+    .replace(/(<br>)+(<span)/g,"$2");
+}
+function addMsg(role, text, animate=true){
+  emptyState?.remove();
+  const d = document.createElement("div");
+  d.className = "msg "+(role==="user"?"user":"tutor");
+  if(!animate) d.style.animation = "none";
+  d.innerHTML = fmt(text);
+  if(role!=="user"){
+    const b = document.createElement("button");
+    b.className="speak"; b.textContent="🔊"; b.title="Read aloud";
+    b.onclick = ()=>speak(text);
+    d.prepend(b);
+  }
+  chatScroll.appendChild(d);
+  chatScroll.scrollTop = chatScroll.scrollHeight;
+}
+function showThinking(on){
+  document.getElementById("thinking")?.remove();
+  if(on){
+    const t=document.createElement("div"); t.id="thinking"; t.className="thinking";
+    t.innerHTML="le tuteur réfléchit <i>…</i>"; chatScroll.appendChild(t);
+    chatScroll.scrollTop = chatScroll.scrollHeight;
+  }
+}
+
+let busy = false;
+async function send(textRaw){
+  const text = textRaw.trim();
+  if(!text || busy) return;
+  input.value = ""; autosize();
+  if(!S.chatStart){ S.chatStart = Date.now(); }
+  S.chat.push({role:"user", text}); save();
+  addMsg("user", text);
+  endRow.hidden = false;
+  busy = true; showThinking(true);
+  try{
+    const reply = await gemini(toContents(S.chat));
+    S.chat.push({role:"model", text:reply}); save();
+    showThinking(false);
+    addMsg("model", reply);
+    if(S.tts) speak(reply);
+  }catch(e){
+    showThinking(false);
+    toast("⚠ "+e.message);
+    S.chat.pop(); save(); // let them retry the same message
+    input.value = text; autosize();
+  }
+  busy = false;
+}
+
+document.getElementById("sendBtn").onclick = ()=>send(input.value);
+input.addEventListener("keydown", e=>{
+  if(e.key==="Enter" && !e.shiftKey){ e.preventDefault(); send(input.value); }
+});
+function autosize(){ input.style.height="auto"; input.style.height=Math.min(input.scrollHeight,120)+"px"; }
+input.addEventListener("input", autosize);
+
+/* modes */
+document.getElementById("modes").addEventListener("click", e=>{
+  const b = e.target.closest(".mode"); if(!b) return;
+  document.querySelectorAll(".mode").forEach(x=>x.classList.remove("active"));
+  b.classList.add("active");
+  S.chatMode = b.dataset.mode; save();
+  if(S.chat.length) send(S.chatMode + " — switch to this mode now.");
+});
+
+/* restore ongoing chat on load */
+(function restore(){
+  document.querySelectorAll(".mode").forEach(x=>x.classList.toggle("active", x.dataset.mode===S.chatMode));
+  if(S.chat.length){
+    emptyState?.remove();
+    S.chat.forEach(m=>addMsg(m.role, m.text, false));
+    endRow.hidden = false;
+  }
+})();
+
+/* ============================== end session ============================== */
+document.getElementById("endBtn").onclick = async ()=>{
+  if(busy || !S.chat.length) return;
+  busy = true; showThinking(true);
+  const transcript = S.chat.map(m=>(m.role==="user"?"STUDENT: ":"TUTOR: ")+m.text).join("\n\n");
+  const sys = `You are a French tutor's assistant. Extract structured learning data from the session transcript. Reply with pure JSON only, matching:
+{"errors":[{"wrong":"student's incorrect French","right":"corrected French","note":"one-line English explanation"}],
+ "cards":[{"front":"French word/phrase","back":"English meaning + one short example sentence in French"}],
+ "focus":"one sentence: what the student should focus on next session"}
+Rules: only real errors the student made (3-10 of the most instructive); 3-6 cards for genuinely new vocabulary/structures; keep every string short.`;
+  try{
+    const raw = await gemini([{role:"user",parts:[{text:"TRANSCRIPT:\n\n"+transcript}]}], {json:true, sys});
+    const j = JSON.parse(raw.slice(raw.indexOf("{"), raw.lastIndexOf("}")+1));
+    let newE=0, bumped=0;
+    (j.errors||[]).forEach(e=>{
+      if(!e.wrong || !e.right) return;
+      const key = e.wrong.toLowerCase().replace(/[^\p{L}\p{N}' ]/gu,"").trim();
+      const hit = S.errors.find(x=>x.key===key);
+      if(hit){ hit.count++; hit.last=today(); hit.right=e.right; hit.note=e.note||hit.note; bumped++; }
+      else { S.errors.push({key, wrong:e.wrong, right:e.right, note:e.note||"", count:1, last:today()}); newE++; }
+    });
+    (j.cards||[]).forEach(c=>{ if(c.front&&c.back) S.cards.push({front:c.front, back:c.back, added:today()}); });
+    if(j.focus) S.focus = j.focus;
+    const mins = S.chatStart ? Math.max(1, Math.round((Date.now()-S.chatStart)/60000)) : null;
+    S.sessions.push({date:today(), mode:S.chatMode, turns:Math.ceil(S.chat.length/2), mins});
+    S.chat = []; S.chatStart = null; save();
+    showThinking(false); busy = false;
+    chatScroll.innerHTML = "";
+    addMsg("model", `**Session saved.** ${newE} new error(s), ${bumped} repeat(s) logged, ${(j.cards||[]).length} Anki card(s) added.\n\n**Next focus:** ${S.focus||"—"}\n\nÀ demain ! 🔥`);
+    endRow.hidden = true;
+    renderAll();
+  }catch(e){
+    showThinking(false); busy = false;
+    toast("⚠ Could not save session: "+e.message);
+  }
+};
+
+/* ============================== voice ============================== */
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+let rec = null, recording = false;
+const micBtn = document.getElementById("micBtn");
+if(!SR){ micBtn.style.display="none"; }
+micBtn.onclick = ()=>{
+  if(recording){ rec?.stop(); return; }
+  rec = new SR();
+  rec.lang = "fr-FR"; rec.interimResults = true; rec.continuous = false;
+  let finalText = "";
+  rec.onresult = e=>{
+    let interim = "";
+    for(const r of e.results){ if(r.isFinal) finalText += r[0].transcript; else interim += r[0].transcript; }
+    input.value = (finalText + interim).trim(); autosize();
+  };
+  rec.onend = ()=>{ recording=false; micBtn.classList.remove("rec"); input.focus(); };
+  rec.onerror = ev=>{ recording=false; micBtn.classList.remove("rec"); if(ev.error!=="aborted"&&ev.error!=="no-speech") toast("Mic: "+ev.error); };
+  recording = true; micBtn.classList.add("rec"); rec.start();
+};
+
+let frVoice = null;
+function pickVoice(){
+  const vs = speechSynthesis.getVoices();
+  frVoice = vs.find(v=>/^fr[-_]/i.test(v.lang) && /google|natural|premium/i.test(v.name)) || vs.find(v=>/^fr[-_]/i.test(v.lang)) || null;
+}
+if("speechSynthesis" in window){ pickVoice(); speechSynthesis.onvoiceschanged = pickVoice; }
+function speak(text){
+  if(!("speechSynthesis" in window)) return;
+  const spoken = text.split("\n").filter(l=>!l.trim().startsWith("▸")).join(" ")
+    .replace(/\*\*?/g,"").replace(/\(.*?\)/g,"").trim();
+  if(!spoken) return;
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(spoken);
+  u.lang = "fr-FR"; if(frVoice) u.voice = frVoice; u.rate = 0.92;
+  speechSynthesis.speak(u);
+}
+const ttsBtn = document.getElementById("ttsBtn");
+function renderTts(){ ttsBtn.style.opacity = S.tts ? 1 : .4; ttsBtn.title = "Read-aloud: "+(S.tts?"on":"off"); }
+ttsBtn.onclick = ()=>{ S.tts=!S.tts; save(); renderTts(); if(!S.tts) speechSynthesis?.cancel(); };
+
+/* ============================== tabs & lists ============================== */
+document.querySelectorAll(".tab").forEach(t=>t.onclick = ()=>{
+  document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
+  document.querySelectorAll(".pane").forEach(x=>x.classList.remove("active"));
+  t.classList.add("active");
+  document.getElementById("pane-"+t.dataset.pane).classList.add("active");
+  renderAll();
+});
+
+function renderErrors(){
+  const list = document.getElementById("errList");
+  const sorted = S.errors.slice().sort((a,b)=>b.count-a.count || (b.last||"").localeCompare(a.last||""));
+  document.getElementById("errCount").textContent = S.errors.length ? S.errors.length : "";
+  list.innerHTML = sorted.length ? "" : '<p class="hint">Nothing yet — errors appear here after your first "End session".</p>';
+  sorted.forEach(e=>{
+    const d = document.createElement("div"); d.className="card err";
+    d.innerHTML = `<button class="del" title="Remove (mastered)">✕</button><span class="meta">${e.count}×</span>
+      <span class="wrong">${esc(e.wrong)}</span> → <span class="right">${esc(e.right)}</span>
+      <div class="note">${esc(e.note||"")}</div>`;
+    d.querySelector(".del").onclick = ()=>{ S.errors = S.errors.filter(x=>x!==e); save(); renderAll(); };
+    list.appendChild(d);
+  });
+}
+function renderAnki(){
+  const list = document.getElementById("ankiList");
+  list.innerHTML = S.cards.length ? "" : '<p class="hint">No cards yet — they appear after "End session".</p>';
+  S.cards.slice().reverse().forEach(c=>{
+    const d = document.createElement("div"); d.className="card anki";
+    d.innerHTML = `<div class="front">${esc(c.front)}</div><div class="back">${esc(c.back)}</div>`;
+    list.appendChild(d);
+  });
+}
+document.getElementById("copyTsv").onclick = async ()=>{
+  if(!S.cards.length) return toast("No cards yet");
+  const tsv = S.cards.map(c=>`${c.front.replace(/\t/g," ")}\t${c.back.replace(/\t/g," ")}`).join("\n");
+  try{ await navigator.clipboard.writeText(tsv); toast("Copied "+S.cards.length+" cards — paste into Anki import"); }
+  catch(e){ toast("Copy failed — use Download CSV"); }
+};
+document.getElementById("dlCsv").onclick = ()=>{
+  if(!S.cards.length) return toast("No cards yet");
+  const csv = S.cards.map(c=>`"${c.front.replace(/"/g,'""')}","${c.back.replace(/"/g,'""')}"`).join("\n");
+  dl("anki-cards-"+today()+".csv", csv, "text/csv");
+};
+document.getElementById("clearCards").onclick = ()=>{
+  if(S.cards.length && confirm("Clear all "+S.cards.length+" cards? (Do this after importing them into Anki.)")){
+    S.cards = []; save(); renderAll();
+  }
+};
+
+function streak(){
+  const days = new Set(S.sessions.map(s=>s.date));
+  let n=0; const d = new Date();
+  if(!days.has(today())) d.setDate(d.getDate()-1); // streak survives until end of today
+  while(days.has(d.toISOString().slice(0,10))){ n++; d.setDate(d.getDate()-1); }
+  return n;
+}
+function renderStats(){
+  const wk = S.sessions.filter(s=>(Date.now()-new Date(s.date))/864e5 < 7).length;
+  document.getElementById("stStreak").textContent = streak();
+  document.getElementById("stWeek").textContent = wk;
+  document.getElementById("stTotal").textContent = S.sessions.length;
+  document.getElementById("focusBox").innerHTML = S.focus ? "<b>Next focus:</b> "+esc(S.focus) : "No focus yet — finish your first session.";
+  const row = document.getElementById("weekRow"); row.innerHTML="";
+  const days = new Set(S.sessions.map(s=>s.date));
+  for(let i=6;i>=0;i--){
+    const d = new Date(); d.setDate(d.getDate()-i);
+    const iso = d.toISOString().slice(0,10);
+    const el = document.createElement("div");
+    el.className = "day"+(days.has(iso)?" done":"");
+    el.innerHTML = `<div class="dot">${days.has(iso)?"✓":""}</div>${["S","M","T","W","T","F","S"][d.getDay()]}`;
+    row.appendChild(el);
+  }
+  document.getElementById("streakPill").textContent = "🔥 "+streak();
+}
+function renderAll(){ renderErrors(); renderAnki(); renderStats(); renderTts();
+  document.getElementById("levelPill").textContent = S.level; }
+
+/* ============================== backup ============================== */
+function dl(name, text, type){
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([text],{type})); a.download = name;
+  a.click(); URL.revokeObjectURL(a.href);
+}
+document.getElementById("expBtn").onclick = ()=>{
+  const {apiKey, ...rest} = S; // never write the key into a backup file
+  dl("french-tutor-backup-"+today()+".json", JSON.stringify(rest,null,1), "application/json");
+};
+document.getElementById("impBtn").onclick = ()=>document.getElementById("impFile").click();
+document.getElementById("impFile").onchange = async e=>{
+  const f = e.target.files[0]; if(!f) return;
+  try{
+    const j = JSON.parse(await f.text());
+    S = Object.assign({}, DEFAULTS, j, {apiKey:S.apiKey, model:S.model});
+    save(); location.reload();
+  }catch(err){ toast("⚠ Not a valid backup file"); }
+};
+
+/* ============================== settings ============================== */
+const dlg = document.getElementById("settings");
+function openSettings(){
+  document.getElementById("setKey").value = S.apiKey;
+  document.getElementById("setModel").value = S.model;
+  document.getElementById("setLevel").value = S.level;
+  dlg.showModal();
+}
+document.getElementById("settingsBtn").onclick = openSettings;
+document.getElementById("levelPill").onclick = openSettings;
+document.getElementById("setCancel").onclick = ()=>dlg.close();
+document.getElementById("setSave").onclick = ()=>{
+  S.apiKey = document.getElementById("setKey").value.trim();
+  S.model = document.getElementById("setModel").value.trim() || "gemini-2.5-flash";
+  S.level = document.getElementById("setLevel").value;
+  save(); dlg.close(); renderAll(); toast("Saved");
+};
+
+/* ============================== misc ============================== */
+let toastT;
+function toast(msg){
+  const t = document.getElementById("toast");
+  t.textContent = msg; t.classList.add("show");
+  clearTimeout(toastT); toastT = setTimeout(()=>t.classList.remove("show"), 3500);
+}
+renderAll();
+if(!S.apiKey) setTimeout(openSettings, 400);
+</script>
+</body>
+</html>
