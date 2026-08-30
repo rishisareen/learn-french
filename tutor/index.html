@@ -351,15 +351,15 @@ GENERAL RULES
 2. Correct EVERY error — never let one pass to be polite. Put each correction on its own line starting with the character ▸ like: ▸ wrong → right — one-line English explanation. (Lines starting with ▸ are not read aloud, so keep spoken French on normal lines.)
 3. No empty praise. Only call my French "good" when it truly is for my level. Level assessments must be honest and strict against CEFR descriptors.
 4. Keep replies compact — this is a chat, not an essay. In CONVERSATION mode, your French comes first on normal lines, then ▸ corrections, then your next question.
-5. SCAFFOLDING — I am a learner and often will not know what to say. In CONVERSATION and QUIZ modes, ALWAYS end your reply with 2 or 3 suggested replies I could send next, each on its own line starting with the character » in exactly this format: » French text — English meaning. Use … where I should fill in my own detail (name, city, etc.). At level A0-A2 never leave me without » suggestions; from B1 include them only when I seem stuck.
+5. SCAFFOLDING — I am a learner and often will not know what to say. Whenever your reply expects something from me, ALWAYS end it with 2 or 3 suggestions, each on its own line starting with the character » in exactly this format: » French text — English meaning. What the suggestions are depends on the mode: in CONVERSATION and QUIZ they are candidate answers; in GRAMMAR they are topic choices; in WRITING they are opening-sentence ideas for the task; in EXAM they are task choices or useful model phrases. Use … where I should fill in my own detail (name, city, etc.). At level A0-A2 never leave me without » suggestions; from B1 include them only when I seem stuck.
 6. At level A0-A1: keep your French to one or two short sentences and put an English translation in (parentheses) immediately after each French sentence. Reduce the translations gradually from A2.
 7. If I send exactly "AIDE": explain your previous French message word by word in English, then give 3 » suggestions.
 
 SESSION MODES (my message may start with the mode name; otherwise use the current mode: ${S.chatMode})
 - CONVERSATION: converse in French about everyday topics. Teach one new phrase at a time, then get me to use it. Slightly slower/simpler than natural at first. Ask questions so I talk more than you. Correct via ▸ lines each turn.
 - WRITING: give me one short writing task for my level (later: TCF-style — messages, formal letters, opinion texts). When I send text, correct line by line with ▸ lines, then show a model version slightly above my level.
-- GRAMMAR: I name a topic or paste a confusing sentence. Explain in plain English with 5 examples, then drill me with 5 quick exercises, one at a time.
-- QUIZ: test me on my recurring errors and recent vocabulary — translation both directions, fill-in-the-blank. One question at a time; correct before the next.
+- GRAMMAR: I name a topic or paste a confusing sentence — or, when I ask you to choose, propose 2-3 grammar topics that fit my level ${S.level} and my error log as » options. Explain the topic in plain English with 5 examples, then drill me with 5 quick exercises, one at a time.
+- QUIZ: quiz me AT MY CURRENT LEVEL (${S.level}). Prioritize my recurring-errors list when it has entries; fill the rest with high-frequency vocabulary, conjugations, and structures appropriate for ${S.level} — never material far above it. Translation both directions, fill-in-the-blank. One question at a time; correct before asking the next.
 - EXAM: simulate a TCF Canada speaking or writing task with realistic format and timing, then score me against TCF criteria and state exactly what separates my answer from an NCLC 7 answer.
 
 If I drift off-topic or into English chat, pull me back to French practice.`;
@@ -491,17 +491,34 @@ function autosize(){ input.style.height="auto"; input.style.height=Math.min(inpu
 input.addEventListener("input", autosize);
 
 /* modes */
+const MODE_KICKOFF = {
+  CONVERSATION: "CONVERSATION — let's talk. Start (or pick up) a conversation suited to my level, and give me » reply suggestions.",
+  WRITING: "WRITING — give me one writing task for my current level, with » opening-sentence ideas.",
+  GRAMMAR: "GRAMMAR — propose 2-3 grammar topics that fit my current level and my error log, as » options I can tap.",
+  QUIZ: "QUIZ — quiz me at my current level: my error log first, then level-appropriate vocabulary and grammar. One question at a time, with » candidate answers.",
+  EXAM: "EXAM — set up a TCF Canada style task appropriate for my current level and walk me through it, with » choices."
+};
+const MODE_PLACEHOLDER = {
+  CONVERSATION: "Écrivez en français…",
+  WRITING: "Write your text here…",
+  GRAMMAR: "Name a grammar topic, or tap a suggestion…",
+  QUIZ: "Your answer…",
+  EXAM: "Your answer…"
+};
 document.getElementById("modes").addEventListener("click", e=>{
-  const b = e.target.closest(".mode"); if(!b) return;
+  const b = e.target.closest(".mode"); if(!b || busy) return;
   document.querySelectorAll(".mode").forEach(x=>x.classList.remove("active"));
   b.classList.add("active");
   S.chatMode = b.dataset.mode; save();
-  if(S.chat.length) send(S.chatMode + " — switch to this mode now.");
+  input.placeholder = MODE_PLACEHOLDER[S.chatMode] || "Écrivez en français…";
+  document.querySelectorAll(".sugs").forEach(x=>x.remove()); // stale suggestions from the old mode
+  send(MODE_KICKOFF[S.chatMode]);
 });
 
 /* restore ongoing chat on load */
 (function restore(){
   document.querySelectorAll(".mode").forEach(x=>x.classList.toggle("active", x.dataset.mode===S.chatMode));
+  input.placeholder = MODE_PLACEHOLDER[S.chatMode] || "Écrivez en français…";
   if(S.chat.length){
     emptyState?.remove();
     S.chat.forEach(m=>addMsg(m.role, m.text, false));
@@ -543,7 +560,7 @@ document.getElementById("endBtn").onclick = async ()=>{
     S.chat = []; S.chatStart = null; save();
     showThinking(false); busy = false;
     chatScroll.innerHTML = "";
-    addMsg("model", `**Session saved.** ${r.newE} new error(s), ${r.bumped} repeat(s) logged, ${r.cards} Anki card(s) added.\n\n**Next focus:** ${S.focus||"—"}\n\nÀ demain ! 🔥`);
+    addMsg("model", `**Session saved.** ${r.newE} new error(s), ${r.bumped} repeat(s) logged, ${r.cards} Anki card(s) added.\n\n**Next focus:** ${S.focus||"—"}\n\nLevel: **${S.level}** — when a milestone says you've moved up, change it via the ${S.level} pill at the top.\n\nÀ demain ! 🔥`);
     endRow.hidden = true;
     renderAll();
   }catch(e){
