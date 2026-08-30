@@ -1,8 +1,9 @@
-# French for Canada PR — 18-Month Plan
+# French for Canada PR — 18-Month Plan (AI-Centric)
 
 **Learner:** 47, Delhi, strong English (base language). Has Pimsleur French Levels 1–5 (MP3).
 **Goal:** **NCLC 7 in all four skills** (reading, writing, listening, speaking) on **TCF Canada** (or TEF Canada) — the entry ticket to Express Entry's French-language proficiency category draws.
 **Plan start:** September 2026 · **Target test window:** Month 16–18 (Jan–Mar 2028), retake buffer to Month 20.
+**Approach:** DIY with an **AI tutor as the daily teacher**; human input reduced to a weekly calibration role. No AF enrollment for A1 (AF Delhi remains the exam venue, and its TCF prep course stays an option for the final phase).
 
 ---
 
@@ -24,45 +25,63 @@ English speaker → B2 French ≈ **600–700 effective hours**. At a sustainabl
 
 | When | Level | Can do | Checkpoint |
 |---|---|---|---|
-| Month 3 | A1 | Introductions, present tense, ~1,000 words, decent pronunciation | Finish A1 course block; Pimsleur L2 underway |
+| Month 3 | A1 | Introductions, present tense, ~1,000 words, decent pronunciation | Grammar spine A1 done; Pimsleur L2 underway; **adherence gate** (see below) |
 | Month 7 | A2 | Simple conversations, past + future tenses | Comfortable on a DELF A2 past paper |
-| Month 12 | B1 | 30-min tutor conversation; follow *InnerFrench*; 150-word structured text | Mock TCF ≈ NCLC 5–6 |
+| Month 12 | B1 | 30-min conversation without English; follow *InnerFrench*; 150-word structured text | Mock TCF ≈ NCLC 5–6 |
 | Month 15 | B2 threshold | Argue an opinion, narrate across tenses, near-native-speed listening | Full timed mocks; switch to pure exam prep |
 | Month 16–18 | Test | — | Sit TCF Canada (buffer to Month 20 for one retake) |
 
+**Month-3 adherence gate:** if the daily routine held (AI voice sessions, Anki streak, Pimsleur L1 passed), continue DIY into A2. If 2–3 weeks slipped, that's data, not a character flaw — buy structure (AF intensive or more human tutor hours) for the next phase.
+
 Months 8–15 are the plateau. Progress goes invisible; the checkpoints exist to prove it's still happening. Do not quit there.
 
-## The method — five components in parallel
+## The method — six components in parallel
 
-1. **Structured spine:** Alliance Française de Delhi (Lodhi Estate) — also the Delhi TCF Canada exam centre. Pre-pay the full course (stakes). If group pace frustrates, swap for 3–4 weekly 1-on-1 tutor hours — but keep *some* scheduled structure.
-2. **Pimsleur (Months 1–6):** one 30-min lesson daily on the commute, Levels 1–3 minimum. Repeat a lesson if you can't produce ~80% of the responses — the checkmark means *passed*, not *played*. Hand the commute to *InnerFrench* when it becomes comprehensible (~Month 5–6); don't finish Level 5 for completeness's sake. Covers speaking + listening only — two of four scored skills.
-3. **Anki daily (15–20 min):** French 5,000-frequency deck + cards from class. Highest-ROI habit; never skip.
-4. **Tutor from Week 3:** 2–3 × 1 hr/week on iTalki/Preply (francophone-African tutors, ₹500–900/hr). From Month 4, add **one corrected written paragraph per week** — writing is a quarter of the score and nothing else in this plan teaches it.
-5. **Exam prep (final 3–4 months):** TCF/TEF task templates, connector phrases, formal-letter and opinion-essay skeletons; PrepMyFuture, TV5Monde, AF Delhi's TCF prep course; **at least 4 full timed mocks**.
+1. **AI tutor — the daily teacher (core).** ChatGPT or Gemini (pick ONE, use its learning/guided mode, and set up a standing custom instruction / Gem — see playbook below). Four daily jobs:
+   - **Voice conversation** (20–30 min/day): spoken French at your exact level, adjustable speed, infinite patience, zero embarrassment — conversation practice from Week 1 instead of Month 4.
+   - **Writing correction** (10–15 min/day): a short daily paragraph, corrected instantly with explanations. This upgrades the old plan's *weekly* human-corrected paragraph to a *daily* loop.
+   - **Grammar on demand:** every confusion explained in English, with drills generated from your own errors.
+   - **Exam role-play** (later phases): unlimited TCF-style speaking/writing tasks.
+2. **Pimsleur (Months 1–6):** one 30-min lesson daily on the commute, Levels 1–3 minimum. Repeat a lesson if you can't produce ~80% of the responses — the checkmark means *passed*, not *played*. Hand the commute to *InnerFrench* when it becomes comprehensible (~Month 5–6). Structured graded audio still beats ad-hoc generated audio for the drive.
+3. **Anki daily (15–20 min):** French 5,000-frequency deck. Have the AI turn your recurring error log and new words into cards. Never skip a day.
+4. **Grammar spine:** *Assimil — New French with Ease* or the free UT *Français interactif*, one lesson at a time, with the AI as explainer when stuck. Pick one, finish it.
+5. **Human calibration — 1 hr/week (non-negotiable).** One iTalki/Preply session weekly (₹600–900/hr; pre-buy a 10–20 session package — that's your stakes). Its jobs are exactly the things AI can't do (see limits below): honest pronunciation feedback, an appointment you can't skip, and a stranger's ear. **From Month 12, switch to a TCF/TEF-experienced tutor** for calibrated scoring of your speaking and writing.
+6. **Exam prep (final 3–4 months):** task templates, connector phrases, formal-letter and opinion-essay skeletons; unlimited AI-generated task practice + **human-scored** timed mocks (at least 4 full ones). AF Delhi's TCF prep course is a good option here.
 
-## Ferriss adaptations (what we kept)
+## Know the AI tutor's four blind spots
 
-- **Stakes:** pre-paid courses, pre-booked tutor blocks, target test date visible to family; from Month 12 the booked slot itself is the stake.
-- **80/20 selection:** top ~1,000 words ≈ 80% coverage; exam-task templates are the 80/20 of the score itself.
-- **Speak from Week 3**, not Month 4.
-- **Deconstruction afternoon (Week 1):** the 12 diagnostic sentences in French — gender, conjugation, negation — to map the machinery up front.
-- **Ignored:** his 3-month "conversationally dangerous" finish line (that's B1; this goal is B2 × 4 skills incl. writing) and the blanket anti-classroom stance.
+Build these into the routine rather than discovering them at the exam:
 
-## Weekly routine (~13 hrs)
+1. **It's too forgiving on pronunciation.** Voice models understand accented, broken French far better than a human examiner will — they normalize your errors, which breeds false confidence. The weekly human session is the pronunciation truth-teller.
+2. **It has no appointments.** Available 24/7 means nothing anchors the habit. Replace the missing structure with: fixed calendar blocks, the weekly human session, the weekly log in this repo, and (from Month 15) a booked test date.
+3. **Its praise is not TCF calibration.** "Great B1 work!" from a chatbot is not a score against the real rubric. Only mock tests and a TCF-experienced human tell you where you actually stand.
+4. **Its French is too clean.** AI speaks clearly at your level; the TCF listening test plays native-speed recordings of varied voices and accents. From Month 6, podcasts, radio (RFI), and film audio must carry the listening load — the AI conversation doesn't count as listening practice.
+
+## AI tutor playbook (set up in Week 1)
+
+Create a standing custom instruction / custom Gem along these lines, and update its level as you progress:
+
+> You are my French tutor. I'm an English speaker preparing for TCF Canada (target: NCLC 7/B2 in all four skills). My current level: [A0 → update monthly]. In voice conversations: speak French at my level, slightly slower than natural, and correct my errors briefly in English after each exchange. In writing sessions: correct my text, explain each error in one line, and keep a running list of my recurring mistakes. Quiz me on that list weekly. Never let an error pass uncorrected.
+
+Daily blocks: morning Anki (15–20 min) → commute Pimsleur (30 min) → evening AI voice conversation (20–30 min) + daily paragraph with correction (10–15 min). Grammar spine lesson 3–4×/week.
+
+## Weekly routine (~13–14 hrs)
 
 | Slot | Time |
 |---|---|
-| AF class (or 1-on-1 equivalent) | 3–4 hrs |
+| AI voice conversation, daily 20–30 min | ~3 hrs |
 | Pimsleur / podcast on commute, daily | ~3 hrs |
 | Anki, daily | ~2 hrs |
-| Tutor speaking sessions ×2–3 | 2–3 hrs |
-| Writing task + review (from Month 4) | 1 hr |
-| Netflix/reading in French (later phases) | 1–2 hrs |
+| Grammar spine lessons | ~2 hrs |
+| Daily paragraph + AI correction | ~1.5 hrs |
+| Human tutor session | 1 hr |
+| French input — podcasts/Netflix/RFI (from Month 6) | 1–2 hrs |
 
 ## Logistics & budget
 
 - **Exam:** TCF Canada at AF Delhi, ~₹26,000/attempt — **budget two attempts**. Slots sell out **within minutes**; start watching the schedule at Month 12 and register the moment the target window opens. Valid passport required at registration.
-- **Listening setup:** Pimsleur MP3s downloaded from Drive to phone, organized `Pimsleur/Level N/`, played in Smart AudioBook Player (Android) / BookPlayer (iOS) — per-lesson progress + finished marks. CloudBeats if streaming from Drive is preferred.
+- **Monthly running cost:** AI subscription ~₹2,000 + human tutor ~₹3,000–4,000 ≈ **₹5–6k/month** (vs ~₹8–10k for the AF-centred version).
+- **Listening setup:** Pimsleur MP3s downloaded from Drive to phone, organized `Pimsleur/Level N/`, played in Smart AudioBook Player (Android) / BookPlayer (iOS) — per-lesson progress + finished marks.
 - **Tracking:** [`trackers/pimsleur.md`](trackers/pimsleur.md) · [`trackers/milestones.md`](trackers/milestones.md) · [`trackers/weekly-log.md`](trackers/weekly-log.md)
 
 ## Sources
