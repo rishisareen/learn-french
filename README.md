@@ -59,9 +59,7 @@ Build these into the routine rather than discovering them at the exam:
 
 ## AI tutor playbook (set up in Week 1)
 
-Create a standing custom instruction / custom Gem along these lines, and update its level as you progress:
-
-> You are my French tutor. I'm an English speaker preparing for TCF Canada (target: NCLC 7/B2 in all four skills). My current level: [A0 → update monthly]. In voice conversations: speak French at my level, slightly slower than natural, and correct my errors briefly in English after each exchange. In writing sessions: correct my text, explain each error in one line, and keep a running list of my recurring mistakes. Quiz me on that list weekly. Never let an error pass uncorrected.
+The full paste-ready Gem instruction lives in [`prompts/gemini-tutor.md`](prompts/gemini-tutor.md) — session modes (CONVERSATION / WRITING / GRAMMAR / QUIZ / EXAM), strict-correction rules, honest CEFR assessment, and an end-of-session error log that feeds Anki. Update its "MY CURRENT LEVEL" line monthly.
 
 Daily blocks: morning Anki (15–20 min) → commute Pimsleur (30 min) → evening AI voice conversation (20–30 min) + daily paragraph with correction (10–15 min). Grammar spine lesson 3–4×/week.
 
