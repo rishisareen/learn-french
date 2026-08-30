@@ -85,6 +85,15 @@
   .msg .speak:hover{opacity:1}
   .msg .corr{display:block; color:var(--red); font-size:.88rem; margin-top:4px}
   .msg b{font-weight:700} .msg i{font-style:italic}
+  .sugs{align-self:flex-start; display:flex; flex-wrap:wrap; gap:8px; max-width:92%; animation:rise .25s ease both}
+  .sug{
+    text-align:left; cursor:pointer; font:inherit; background:var(--paper-2);
+    border:1.5px dashed var(--blue); border-radius:12px; padding:8px 12px; color:var(--ink);
+  }
+  .sug:hover{border-style:solid; background:var(--blue-soft)}
+  .sug .fr{display:block; font-weight:600; color:var(--blue)}
+  .sug .en{display:block; font-size:.78rem; color:var(--ink-soft)}
+  .sugs .sughint{flex-basis:100%; font-size:.72rem; color:var(--ink-soft); margin:-2px 0 0 2px}
   .empty{margin:auto; text-align:center; color:var(--ink-soft); padding:32px 24px; max-width:420px}
   .empty h2{font-family:'Fraunces',serif; font-weight:600; color:var(--ink); margin:0 0 8px; font-size:1.3rem}
   .empty p{margin:.4em 0; font-size:.92rem}
@@ -207,13 +216,15 @@
       <div id="chatScroll">
         <div class="empty" id="emptyState">
           <h2>Bonjour&nbsp;!</h2>
-          <p>Pick a mode above and say something — or tap 🎙 and speak.</p>
-          <p>Your tutor already knows your level and your recurring errors from previous sessions. When you finish, press <b>End session</b>: errors and Anki cards are saved here automatically.</p>
+          <p>You never have to invent French from nothing: after each tutor message you get <b>tap-to-reply suggestions</b> with English meanings, and 💡 explains the last message word by word.</p>
+          <p>When you finish, press <b>End session</b>: your errors and Anki cards are saved automatically.</p>
+          <button class="tbtn" id="startBtn" style="margin-top:10px">🇫🇷 Start my first lesson</button>
         </div>
       </div>
       <div class="endrow" id="endRow" hidden><button class="endbtn" id="endBtn">■ End session &amp; save</button></div>
       <div class="composer">
         <textarea id="input" rows="1" placeholder="Écrivez en français…"></textarea>
+        <button class="cbtn" id="hintBtn" title="AIDE — explain the last message word by word">💡</button>
         <button class="cbtn" id="micBtn" title="Speak (French)">🎙</button>
         <button class="cbtn send" id="sendBtn" title="Send">➤</button>
       </div>
@@ -320,9 +331,12 @@ GENERAL RULES
 2. Correct EVERY error — never let one pass to be polite. Put each correction on its own line starting with the character ▸ like: ▸ wrong → right — one-line English explanation. (Lines starting with ▸ are not read aloud, so keep spoken French on normal lines.)
 3. No empty praise. Only call my French "good" when it truly is for my level. Level assessments must be honest and strict against CEFR descriptors.
 4. Keep replies compact — this is a chat, not an essay. In CONVERSATION mode, your French comes first on normal lines, then ▸ corrections, then your next question.
+5. SCAFFOLDING — I am a learner and often will not know what to say. In CONVERSATION and QUIZ modes, ALWAYS end your reply with 2 or 3 suggested replies I could send next, each on its own line starting with the character » in exactly this format: » French text — English meaning. Use … where I should fill in my own detail (name, city, etc.). At level A0-A2 never leave me without » suggestions; from B1 include them only when I seem stuck.
+6. At level A0-A1: keep your French to one or two short sentences and put an English translation in (parentheses) immediately after each French sentence. Reduce the translations gradually from A2.
+7. If I send exactly "AIDE": explain your previous French message word by word in English, then give 3 » suggestions.
 
 SESSION MODES (my message may start with the mode name; otherwise use the current mode: ${S.chatMode})
-- CONVERSATION: converse in French about everyday topics. Slightly slower/simpler than natural at first. Ask questions so I talk more than you. Correct via ▸ lines each turn.
+- CONVERSATION: converse in French about everyday topics. Teach one new phrase at a time, then get me to use it. Slightly slower/simpler than natural at first. Ask questions so I talk more than you. Correct via ▸ lines each turn.
 - WRITING: give me one short writing task for my level (later: TCF-style — messages, formal letters, opinion texts). When I send text, correct line by line with ▸ lines, then show a model version slightly above my level.
 - GRAMMAR: I name a topic or paste a confusing sentence. Explain in plain English with 5 examples, then drill me with 5 quick exercises, one at a time.
 - QUIZ: test me on my recurring errors and recent vocabulary — translation both directions, fill-in-the-blank. One question at a time; correct before the next.
@@ -367,19 +381,47 @@ function fmt(s){
       ? `<span class="corr">${line}</span>` : line).join("<br>")
     .replace(/(<br>)+(<span)/g,"$2");
 }
+function splitSuggestions(text){
+  const sug = [], body = [];
+  text.split("\n").forEach(l=>{
+    if(l.trim().startsWith("»")) sug.push(l.trim().replace(/^»\s*/,""));
+    else body.push(l);
+  });
+  return {sug, body: body.join("\n").trim()};
+}
 function addMsg(role, text, animate=true){
   emptyState?.remove();
+  const isTutor = role!=="user";
+  const {sug, body} = isTutor ? splitSuggestions(text) : {sug:[], body:text};
   const d = document.createElement("div");
-  d.className = "msg "+(role==="user"?"user":"tutor");
+  d.className = "msg "+(isTutor?"tutor":"user");
   if(!animate) d.style.animation = "none";
-  d.innerHTML = fmt(text);
-  if(role!=="user"){
+  d.innerHTML = fmt(body || text);
+  if(isTutor){
     const b = document.createElement("button");
     b.className="speak"; b.textContent="🔊"; b.title="Read aloud";
     b.onclick = ()=>speak(text);
     d.prepend(b);
   }
   chatScroll.appendChild(d);
+  if(sug.length){
+    document.querySelectorAll(".sugs").forEach(x=>x.remove()); // only latest suggestions stay
+    const wrap = document.createElement("div"); wrap.className="sugs";
+    if(!animate) wrap.style.animation = "none";
+    sug.forEach(s=>{
+      const m = s.split(/\s+—\s+|\s+--\s+|\s+-\s+/);
+      const fr = (m[0]||s).trim(), en = (m.slice(1).join(" ")||"").trim();
+      const c = document.createElement("button"); c.className="sug";
+      c.innerHTML = `<span class="fr">${esc(fr)}</span>${en?`<span class="en">${esc(en)}</span>`:""}`;
+      c.onclick = ()=>{ input.value = fr; autosize(); input.focus();
+        if(fr.includes("…")) toast("Replace … with your own word before sending"); };
+      wrap.appendChild(c);
+    });
+    const h = document.createElement("div"); h.className="sughint";
+    h.textContent = "tap a reply to use it — edit before sending if you like";
+    wrap.appendChild(h);
+    chatScroll.appendChild(wrap);
+  }
   chatScroll.scrollTop = chatScroll.scrollHeight;
 }
 function showThinking(on){
@@ -417,6 +459,11 @@ async function send(textRaw){
 }
 
 document.getElementById("sendBtn").onclick = ()=>send(input.value);
+document.getElementById("hintBtn").onclick = ()=>{
+  if(S.chat.length) send("AIDE"); else toast("Start the conversation first");
+};
+document.getElementById("startBtn")?.addEventListener("click", ()=>
+  send("CONVERSATION — I am starting from zero. Teach me my very first French phrase, one small thing at a time, and give me » suggestions so I know how to reply."));
 input.addEventListener("keydown", e=>{
   if(e.key==="Enter" && !e.shiftKey){ e.preventDefault(); send(input.value); }
 });
@@ -507,7 +554,7 @@ function pickVoice(){
 if("speechSynthesis" in window){ pickVoice(); speechSynthesis.onvoiceschanged = pickVoice; }
 function speak(text){
   if(!("speechSynthesis" in window)) return;
-  const spoken = text.split("\n").filter(l=>!l.trim().startsWith("▸")).join(" ")
+  const spoken = text.split("\n").filter(l=>{const t=l.trim(); return !t.startsWith("▸") && !t.startsWith("»");}).join(" ")
     .replace(/\*\*?/g,"").replace(/\(.*?\)/g,"").trim();
   if(!spoken) return;
   speechSynthesis.cancel();
